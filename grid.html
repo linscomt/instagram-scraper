@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-br">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="">
+        <meta name="author" content="">
+
+        <title>Obter postagens Instagram</title>
+
+        <!-- Bootstrap core CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+
+        <!-- Custom styles for this template -->
+        <link href="style.css" rel="stylesheet">
+    </head>
+
+    <body class="text-center">
+        <div class="">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Data</th>
+                        <th scope="col">Descrição</th>
+                        <th scope="col">Número de curtidas</th>
+                        <th scope="col">Número de comentários</th>
+                        <th scope="col">Tipo de mídia</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <?php
+                    echo count($medias);
+                    for ($i = 0; $i < count($medias); $i++) {
+                        ?>
+
+                        <tr>
+                            <th scope="row"><?= $i ?></th>
+                            <td><?= $medias[$i]->getCreatedTime() ?></td>
+                            <td><?= $medias[$i]->getCaption() ?></td>
+                            <td><?= $medias[$i]->getLikesCount() ?></td>
+                            <td><?= $medias[$i]->getCommentsCount() ?></td>
+                            <td><?= $medias[$i]->getType() ?></td>
+                        </tr>
+                        <?php
+                    }
+                    ?>
+
+                </tbody>
+            </table>
+        </div>
+    </body>
+</html>

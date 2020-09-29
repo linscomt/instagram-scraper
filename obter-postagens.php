@@ -8,12 +8,27 @@ if (!isset($_POST["insta"])) {
 }
 
 $username = str_replace("@", "", $_POST["insta"]);
-$qtdPosts = $_POST["qtdPosts"];
-
+//$qtdPosts = $_POST["qtdPosts"];
+$qtdPosts = 450;
 
 // If account is public you can query Instagram without auth
 $instagram = new \InstagramScraper\Instagram();
 $medias = $instagram->getMedias($username, $qtdPosts);
+
+$ultimaData = new DateTime();
+$ultimaData->setTimestamp($medias[count($medias) - 1]->getCreatedTime());
+
+$dataInicio = new DateTime();
+$dataInicio->setTimestamp(1583020800);
+
+$dataFim = new DateTime();
+$dataFim->setTimestamp(1598832000);
+
+if ($dataInicio < $ultimaData) {
+    $qtdPosts = $qtdPosts + 100;
+    $instagram = new \InstagramScraper\Instagram();
+    $medias = $instagram->getMedias($username, $qtdPosts);
+}
 
 // If account private you should be subscribed and after auth it will be available
 //$instagram = \InstagramScraper\Instagram::withCredentials('username', 'password', 'path/to/cache/folder');
@@ -64,7 +79,7 @@ function get_hashtags($string, $str = 1) {
         <div class="container">
 
             <h1>Resultado da extração de postagens do Instagram</h1>
-            <p class="lead">Foram extraídas <strong><?= count($medias) ?></strong> postagens da conta <strong>@<?= $username ?></strong> </p>
+            <p class="lead">Extração de postagens da conta <strong>@<?= $username ?></strong> </p>
             <a href="./exportarCSV.php">Exportar para CSV</a>
 
             <div class="row">
@@ -87,34 +102,48 @@ function get_hashtags($string, $str = 1) {
                             <?php
                             $listaPosts = array();
                             $username = '"' . $username . '"';
+                            $contPost = 0;
                             for ($i = 0; $i < count($medias); $i++) {
-                                ?>
+                                $date = new DateTime();
+                                $date->setTimestamp($medias[$i]->getCreatedTime());
 
-                                <tr>
-                                    <th scope="row"><?= $i + 1 ?></th>
-                                    <td> <a href="<?= $medias[$i]->getLink() ?>"><img src="<?= $medias[$i]->getImageHighResolutionUrl() ?>" width="100" height="100"></a></td>
-                                    <td><?= $medias[$i]->getType() ?></td>
-                                    <td><?= date('d/m/Y', $medias[$i]->getCreatedTime()) ?></td>
-                                    <td><?= $medias[$i]->getCaption() ?></td>
-                                    <td><?= $medias[$i]->getLikesCount() ?></td>
-                                    <td><?= $medias[$i]->getCommentsCount() ?></td>
-                                    <td><?= get_hashtags($medias[$i]->getCaption()) ?></td>
-                                </tr>
-                                <?php
-                                $descricao = $medias[$i]->getCaption();
-                                $descricao = str_replace("\n", "", $descricao);
-                                $descricao = str_replace("\r", "", $descricao);
-                                $descricao = str_replace("'", "", $descricao);
-                                $descricao = utf8_decode($descricao);
-                                $hastags = get_hashtags($medias[$i]->getCaption());
-                                $data = date('d/m/Y', $medias[$i]->getCreatedTime());
-                                
-                                $postagem = array($username, $descricao, $hastags, $data , $medias[$i]->getLikesCount());
+                                $dataInicio = new DateTime();
+                                $dataInicio->setTimestamp(1583020800);
 
-                                array_push($listaPosts, $postagem);
+                                $dataFim = new DateTime();
+                                $dataFim->setTimestamp(1598832000);
+
+                                if ($dataInicio <= $date) {
+                                    if ($dataFim >= $date) {
+                                        ?>
+
+                                        <tr>
+                                            <th scope="row"><?= $contPost = $contPost + 1 ?></th>
+                                            <td> <a href="<?= $medias[$i]->getLink() ?>"><img src="<?= $medias[$i]->getImageHighResolutionUrl() ?>" width="100" height="100"></a></td>
+                                            <td><?= $medias[$i]->getType() ?></td>
+                                            <td><?= date('d/m/Y', $medias[$i]->getCreatedTime()) ?></td>
+                                            <td><?= $medias[$i]->getCaption() ?></td>
+                                            <td><?= $medias[$i]->getLikesCount() ?></td>
+                                            <td><?= $medias[$i]->getCommentsCount() ?></td>
+                                            <td><?= get_hashtags($medias[$i]->getCaption()) ?></td>
+                                        </tr>
+                                        <?php
+                                        $descricao = $medias[$i]->getCaption();
+                                        $descricao = str_replace("\n", "", $descricao);
+                                        $descricao = str_replace("\r", "", $descricao);
+                                        $descricao = str_replace("'", "", $descricao);
+                                        $descricao = utf8_decode($descricao);
+                                        $hastags = get_hashtags($medias[$i]->getCaption());
+                                        $data = date('d/m/Y', $medias[$i]->getCreatedTime());
+
+                                        $postagem = array($username, $descricao, $hastags, $data, $medias[$i]->getLikesCount());
+
+                                        array_push($listaPosts, $postagem);
+                                    }
+                                }
                             }
 
-                            
+
                             $_SESSION["postagens"] = $listaPosts;
                             ?>
 

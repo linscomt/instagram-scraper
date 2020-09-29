@@ -21,7 +21,6 @@
             <h1 class="h3 mb-3 font-weight-normal">Obter postagens do Instagram</h1>
             
             <input type="text" id="insta" name="insta" class="form-control" placeholder="Nome do usuário" required autofocus>
-            <input type="number" id="qtdPosts" name="qtdPosts" class="form-control" placeholder="Quantidade de postagens" required>
 
             <button class="btn btn-lg btn-primary btn-block mt-3" type="submit">Obter posts</button>
         </form>

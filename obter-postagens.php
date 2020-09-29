@@ -1,5 +1,7 @@
 <?php
 require __DIR__ . '/vendor/autoload.php';
+require './objetos.php';
+session_start();
 
 if (!isset($_POST["insta"])) {
     header('Location: ./');
@@ -63,7 +65,7 @@ function get_hashtags($string, $str = 1) {
 
             <h1>Resultado da extração de postagens do Instagram</h1>
             <p class="lead">Foram extraídas <strong><?= count($medias) ?></strong> postagens da conta <strong>@<?= $username ?></strong> </p>
-            <a href="./">Nova extração</a>
+            <a href="./exportarCSV.php">Exportar para CSV</a>
 
             <div class="row">
                 <div class="table-responsive">
@@ -83,6 +85,8 @@ function get_hashtags($string, $str = 1) {
 
                         <tbody>
                             <?php
+                            $listaPosts = array();
+                            $username = '"' . $username . '"';
                             for ($i = 0; $i < count($medias); $i++) {
                                 ?>
 
@@ -97,7 +101,21 @@ function get_hashtags($string, $str = 1) {
                                     <td><?= get_hashtags($medias[$i]->getCaption()) ?></td>
                                 </tr>
                                 <?php
+                                $descricao = $medias[$i]->getCaption();
+                                $descricao = str_replace("\n", "", $descricao);
+                                $descricao = str_replace("\r", "", $descricao);
+                                $descricao = str_replace("'", "", $descricao);
+                                $descricao = utf8_decode($descricao);
+                                $hastags = get_hashtags($medias[$i]->getCaption());
+                                $data = date('d/m/Y', $medias[$i]->getCreatedTime());
+                                
+                                $postagem = array($username, $descricao, $hastags, $data , $medias[$i]->getLikesCount());
+
+                                array_push($listaPosts, $postagem);
                             }
+
+                            
+                            $_SESSION["postagens"] = $listaPosts;
                             ?>
 
                         </tbody>
